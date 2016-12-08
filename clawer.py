@@ -3,6 +3,7 @@ import sys
 import json
 import time
 import requests
+from bs4 import BeautifulSoup as bs
 
 method = 'GET'
 url = 'http://wx.sogou.com/weixin?type=1&query=hit_hica&ie=utf8&_sug_=n&_sug_type_='
@@ -47,8 +48,9 @@ for i in xrange(len(urlList)):
 	#using the same  headers
 	res = requests.request(url=url,method=method,headers=headers)
 	
-	content = re.findall('<section.*',res.text)
-	content = sys.exit(-5) if content==[] else content[0].replace('data-src','src')
+	soup = bs(res.text,'lxml')
+	content = soup.find_all(id="js_content")
+	content = sys.exit(-5) if content==[] else content[0].prettify().replace('data-src','src')
 	with open('articles/'+str(msgList[i]['id']),'w') as f:
 		f.write(content.encode('utf-8'))
 	time.sleep(30)
